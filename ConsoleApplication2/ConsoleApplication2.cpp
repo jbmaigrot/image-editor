@@ -1,111 +1,170 @@
-// ConsoleApplication2.cpp : définit le point d'entrée pour l'application console.
-//
+#include <stdafx.h>
+#include <opencv2\opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/videoio/videoio.hpp>
+//#include <opencv2\stitching\stitcher.hpp>
 
-#include "stdafx.h"
-#include "opencv2/highgui/highgui.hpp"
-#include <iostream>
 using namespace cv;
-using namespace std;
 
-#include "opencv2/imgproc/imgproc.hpp"
+//Global variables
+Mat image;
+int W = 0;
+int H = 0;
+int mode = 0;
+int strength = 0;
 
+int choix()
+{
+	int r = -1;
+	printf("\n\tFunctions : \n");
+	printf("\n\tExit : 0");
+	printf("\n\tDilatation / Erosion : 1");
+	printf("\n\tResizing : 2");
+	printf("\n\tLighten / Darken : 3");
+	printf("\n\tPanorama / stitching : 4");
 
-/// Global variables
-Mat src, erosion_dst, dilation_dst;
+	while (r<0 || r>4)
+	{
+		printf("\n\n\tChoix : ");
+		scanf("%d", &r);
+	}
+	return r;
+}
 
-int erosion_elem = 0;
-int erosion_size = 0;
-int dilation_elem = 0;
-int dilation_size = 0;
-int const max_elem = 2;
-int const max_kernel_size = 21;
+void dilatation_erosion(int value, void*)
+{
+	Mat new_image;
 
-/** Function Headers */
-void Erosion(int, void*);
-void Dilation(int, void*);
+	Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * strength + 1, 2 * strength + 1), Point(strength, strength));
 
-/** @function main */
+	if (mode == 0)
+		erode(image, new_image, element);
+	else
+		dilate(image, new_image, element);
+	imshow("Image", new_image);
+}
+
+void light(int value, void*)
+{
+	Mat new_image = image*(double)(value) / 100.0;
+
+	imshow("Image", new_image);
+}
+
+void resizing(int value, void*)
+{
+	Mat new_image;
+	if (H<1)
+		H = 1;
+	if (W<1)
+		W = 1;
+
+	double ratio_x = image.cols / (double)W;
+	double ratio_y = image.rows / (double)H;
+	new_image.create(H, W, CV_8UC(3));
+	for (int i = 0; i<new_image.rows; i++)
+	{
+		for (int j = 0; j<new_image.cols; j++)
+		{
+			Vec3b color = image.at<Vec3b>(Point(j*ratio_x, i*ratio_y));
+
+			new_image.at<Vec3b>(Point(j, i)) = color;
+		}
+	}
+
+	imshow("Image", new_image);
+}
+
+void stitch(int value, void*)
+{
+	printf("Pas encore disponible ...");
+	/* WIP
+	
+	//Mat new_image;
+	Mat image2;
+
+	char lien[500] = "";
+	while (!image2.data)
+	{
+		printf("\t2e image : ");
+		scanf("%s", lien);
+		image2 = imread(lien);
+		if (!image2.data)
+			printf("\tFile not found.\n");
+	}
+
+	Stitcher stitcher = Stitcher::createDefault();
+	Stitcher::Status status = stitcher.stitch(image, image2);
+
+	imshow("Image", image2);*/
+}
+
 int main(int argc, char** argv)
 {
-	/// Load an image
-	if (argc==2)
+	int response = 0;
+
+	printf("\n\tIMG Editor\n\n");
+
+	if (argc<2)
 	{
-		src = imread(argv[1]);
+		char lien[500] = "";
+		while (!image.data)
+		{
+			printf("\tImage : ");
+			scanf("%s", lien);
+			image = imread(lien);
+			if (!image.data)
+				printf("\tFile not found.\n");
+		}
 	}
 	else
+		image = imread(argv[1]);
+
+	int continuer = 1;
+	while (continuer)
 	{
-		char str[256]; // = "C:\\Users\\Jean-Baptiste\\Documents\\Visual Studio 2017\\Projects\\image-editor\\x64\\Debug\\joconde.jpg";
-		printf("Image path: ");
-		fgets(str, 255, stdin);
-		src = imread(str,1);
+		int chx = choix();
+
+		if (chx == 0)
+			continuer = 0;
+		else
+		{
+			namedWindow("Image", WINDOW_NORMAL);
+			cvResizeWindow("Image", 500, 500);
+		}
+
+		if (chx == 1)
+		{
+			int ini = 0;
+			createTrackbar("E/D", "Image", &mode, 1, dilatation_erosion);
+			createTrackbar("Value", "Image", &strength, 10, dilatation_erosion);
+			dilatation_erosion(ini, 0);
+		}
+		else if (chx == 2)
+		{
+			int ini = 0;
+			W = image.cols;
+			H = image.rows;
+			createTrackbar("Width", "Image", &W, 1000, resizing);
+			createTrackbar("Height", "Image", &H, 1000, resizing);
+			resizing(ini, 0);
+		}
+		else if (chx == 3)
+		{
+			int ini = 100;
+			createTrackbar("Brightness", "Image", &ini, 500, light);
+			light(ini, 0);
+		}
+		else if (chx == 4)
+		{
+			int ini = 100;
+			stitch(ini, 0);
+		}
+
+		waitKey(0);
 	}
 
-	if (!src.data)
-	{
-		return -1;
-	}
-
-	/// Create windows
-
-	namedWindow("Erosion Demo", CV_WINDOW_AUTOSIZE);
-	namedWindow("Dilation Demo", CV_WINDOW_AUTOSIZE);
-	cvMoveWindow("Dilation Demo", src.cols, 0);
-
-	/// Create Erosion Trackbar
-	createTrackbar("Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "Erosion Demo",
-		&erosion_elem, max_elem,
-		Erosion);
-
-	createTrackbar("Kernel size:\n 2n +1", "Erosion Demo",
-		&erosion_size, max_kernel_size,
-		Erosion);
-
-	/// Create Dilation Trackbar
-	createTrackbar("Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "Dilation Demo",
-		&dilation_elem, max_elem,
-		Dilation);
-
-	createTrackbar("Kernel size:\n 2n +1", "Dilation Demo",
-		&dilation_size, max_kernel_size,
-		Dilation);
-
-	/// Default start
-	Erosion(0, 0);
-	Dilation(0, 0);
-
-	waitKey(0);
 	return 0;
-}
-
-/**  @function Erosion  */
-void Erosion(int, void*)
-{
-	int erosion_type;
-	if (erosion_elem == 0) { erosion_type = MORPH_RECT; }
-	else if (erosion_elem == 1) { erosion_type = MORPH_CROSS; }
-	else if (erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
-
-	Mat element = getStructuringElement(erosion_type,
-		Size(2 * erosion_size + 1, 2 * erosion_size + 1),
-		Point(erosion_size, erosion_size));
-
-	/// Apply the erosion operation
-	erode(src, erosion_dst, element);
-	imshow("Erosion Demo", erosion_dst);
-}
-
-/** @function Dilation */
-void Dilation(int, void*)
-{
-	int dilation_type;
-	if (dilation_elem == 0) { dilation_type = MORPH_RECT; }
-	else if (dilation_elem == 1) { dilation_type = MORPH_CROSS; }
-	else if (dilation_elem == 2) { dilation_type = MORPH_ELLIPSE; }
-
-	Mat element = getStructuringElement(dilation_type,
-		Size(2 * dilation_size + 1, 2 * dilation_size + 1),
-		Point(dilation_size, dilation_size));
-	/// Apply the dilation operation
-	dilate(src, dilation_dst, element);
-	imshow("Dilation Demo", dilation_dst);
 }

@@ -7,7 +7,7 @@ using namespace cv;
 
 void test()
 {
-    Mat frame= imread("lena.jpg", 1 );
+    Mat frame= imread("joconde.jpg", 1 );
 
     for(int i=0; i<frame.rows; i++)//inversion
     {

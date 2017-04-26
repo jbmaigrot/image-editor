@@ -1,3 +1,10 @@
 ﻿  ConsoleApplication2.cpp
+c:\opencv\build\include\opencv2\flann\logger.h(66): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.14393.0\ucrt\stdio.h(207): note: voir la déclaration de 'fopen'
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\consoleapplication2.cpp(31): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.14393.0\ucrt\stdio.h(1269): note: voir la déclaration de 'scanf'
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\consoleapplication2.cpp(71): warning C4244: 'argument' : conversion de 'double' en 'int', perte possible de données
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\consoleapplication2.cpp(116): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.14393.0\ucrt\stdio.h(1269): note: voir la déclaration de 'scanf'
   ConsoleApplication2.vcxproj -> C:\Users\Jean-Baptiste\Documents\Visual Studio 2017\Projects\image-editor\x64\Debug\ConsoleApplication2.exe
   ConsoleApplication2.vcxproj -> C:\Users\Jean-Baptiste\Documents\Visual Studio 2017\Projects\image-editor\x64\Debug\ConsoleApplication2.pdb (Partial PDB)
