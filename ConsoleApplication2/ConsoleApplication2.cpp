@@ -28,7 +28,17 @@ void Dilation(int, void*);
 int main(int argc, char** argv)
 {
 	/// Load an image
-	src = imread(argv[1]);
+	if (argc==2)
+	{
+		src = imread(argv[1]);
+	}
+	else
+	{
+		char str[256]; // = "C:\\Users\\Jean-Baptiste\\Documents\\Visual Studio 2017\\Projects\\image-editor\\x64\\Debug\\joconde.jpg";
+		printf("Image path: ");
+		fgets(str, 255, stdin);
+		src = imread(str,1);
+	}
 
 	if (!src.data)
 	{
