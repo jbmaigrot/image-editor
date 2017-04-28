@@ -3,43 +3,25 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
 
+#include <iostream>
+
 using namespace cv;
 
-void test()
-{
-    Mat frame= imread("joconde.jpg", 1 );
-
-    for(int i=0; i<frame.rows; i++)//inversion
-    {
-        for(int j=0; j<frame.cols; j++)
-        {
-            Vec3b color = frame.at<Vec3b>(Point(j,i));
-
-            frame.at<Vec3b>(Point(j,i)) = color;
-        }
-    }
-    namedWindow("IMG Editor", WINDOW_AUTOSIZE );
-    imshow("IMG Editor", frame);
-
-    waitKey(0);
-}
-
-///////////////////////////////////////
 
 int choix()
 {
     int r=-1;
-    printf("\n\tFunctions : \n");
-    printf("\n\tExit : 0");
-    printf("\n\tDilatation / Erosion : 1");
-    printf("\n\tResizing : 2");
-    printf("\n\tLighten / Darken : 3");
-    printf("\n\tPanorama / stitching : 4");
+    std::cout << "\nFunctions : \n" << std::endl;
+    std::cout << "Exit : 0" << std::endl;
+    std::cout << "Dilatation / Erosion : 1" << std::endl;
+    std::cout << "Resizing : 2" << std::endl;
+    std::cout << "Lighten / Darken : 3" << std::endl;
+    std::cout << "Panorama / stitching : 4" << std::endl;
 
     while(r<0||r>4)
     {
-        printf("\n\n\tChoix : ");
-        scanf("%d",&r);
+        std::cout << "\nChoix : " << std::endl;
+        std::cin>>r;
     }
     return r;
 }
@@ -48,12 +30,13 @@ Mat image;
 int W=0;
 int H=0;
 int mode=0;
+int strength=0;
 
 void dilatation_erosion(int value, void*)
 {
     Mat new_image;
 
-    Mat element = getStructuringElement(MORPH_ELLIPSE,Size(2 * value + 1, 2 * value + 1),Point(value, value));
+    Mat element = getStructuringElement(MORPH_ELLIPSE,Size(2 * strength + 1, 2 * strength + 1),Point(strength, strength));
 
     if(mode==0)
         erode(image, new_image, element);
@@ -97,18 +80,18 @@ int main(int argc, char** argv )
 {
     int response=0;
 
-    printf("\n\tIMG Editor\n\n");
+    std::cout << "IMG Editor\n" << std::endl;
 
     if(argc<2)
     {
         while(!image.data)
         {
             char lien[500]="";
-            printf("\tImage : ");
-            scanf("%s",lien);
+            std::cout << "Image : " << std::endl;
+            std::cin>>lien;
             image = imread(lien);
             if (!image.data)
-                printf("\tFile not found.\n");
+                std::cout << "File not found." << std::endl;
         }
     }
     else
@@ -121,7 +104,7 @@ int main(int argc, char** argv )
 
         if(chx==0)
             continuer=0;
-        else
+        else if(chx>0&&chx<4)
         {
             namedWindow("Image",WINDOW_NORMAL);
             cvResizeWindow("Image", 500, 500);
@@ -130,8 +113,8 @@ int main(int argc, char** argv )
         if(chx==1)
         {
             int ini=0;
-            createTrackbar("E/D", "Image",&mode, 1);
-            createTrackbar("Value", "Image",&ini, 10,dilatation_erosion);
+            createTrackbar("E/D", "Image",&mode, 1,dilatation_erosion);
+            createTrackbar("Value", "Image",&strength, 10,dilatation_erosion);
             dilatation_erosion(ini, 0);
         }
         else if(chx==2)
@@ -148,6 +131,10 @@ int main(int argc, char** argv )
             int ini=100;
             createTrackbar("Brightness", "Image",&ini, 500,light);
             light(ini, 0);
+        }
+        else if(chx==4)
+        {
+            std::cout << "not yet available in this release." << std::endl;
         }
 
         waitKey(0);
