@@ -1,37 +1,36 @@
-#include <stdafx.h>
-#include <opencv2\opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
-//#include <opencv2\stitching\stitcher.hpp>
+
+#include <iostream>
 
 using namespace cv;
 
-//Global variables
+
+int choix()
+{
+	int r = -1;
+	std::cout << "\nFunctions : \n" << std::endl;
+	std::cout << "Exit : 0" << std::endl;
+	std::cout << "Dilatation / Erosion : 1" << std::endl;
+	std::cout << "Resizing : 2" << std::endl;
+	std::cout << "Lighten / Darken : 3" << std::endl;
+	std::cout << "Panorama / stitching : 4" << std::endl;
+
+	while (r<0 || r>4)
+	{
+		std::cout << "\nChoix : " << std::endl;
+		std::cin >> r;
+	}
+	return r;
+}
+
 Mat image;
 int W = 0;
 int H = 0;
 int mode = 0;
 int strength = 0;
-
-int choix()
-{
-	int r = -1;
-	printf("\n\tFunctions : \n");
-	printf("\n\tExit : 0");
-	printf("\n\tDilatation / Erosion : 1");
-	printf("\n\tResizing : 2");
-	printf("\n\tLighten / Darken : 3");
-	printf("\n\tPanorama / stitching : 4");
-
-	while (r<0 || r>4)
-	{
-		printf("\n\n\tChoix : ");
-		scanf("%d", &r);
-	}
-	return r;
-}
 
 void dilatation_erosion(int value, void*)
 {
@@ -77,46 +76,22 @@ void resizing(int value, void*)
 	imshow("Image", new_image);
 }
 
-void stitch(int value, void*)
-{
-	printf("Pas encore disponible ...");
-	/* WIP
-	
-	//Mat new_image;
-	Mat image2;
-
-	char lien[500] = "";
-	while (!image2.data)
-	{
-		printf("\t2e image : ");
-		scanf("%s", lien);
-		image2 = imread(lien);
-		if (!image2.data)
-			printf("\tFile not found.\n");
-	}
-
-	Stitcher stitcher = Stitcher::createDefault();
-	Stitcher::Status status = stitcher.stitch(image, image2);
-
-	imshow("Image", image2);*/
-}
-
 int main(int argc, char** argv)
 {
 	int response = 0;
 
-	printf("\n\tIMG Editor\n\n");
+	std::cout << "IMG Editor\n" << std::endl;
 
 	if (argc<2)
 	{
-		char lien[500] = "";
 		while (!image.data)
 		{
-			printf("\tImage : ");
-			scanf("%s", lien);
+			char lien[500] = "";
+			std::cout << "Image : " << std::endl;
+			std::cin >> lien;
 			image = imread(lien);
 			if (!image.data)
-				printf("\tFile not found.\n");
+				std::cout << "File not found." << std::endl;
 		}
 	}
 	else
@@ -129,7 +104,7 @@ int main(int argc, char** argv)
 
 		if (chx == 0)
 			continuer = 0;
-		else
+		else if (chx>0 && chx<4)
 		{
 			namedWindow("Image", WINDOW_NORMAL);
 			cvResizeWindow("Image", 500, 500);
@@ -159,8 +134,7 @@ int main(int argc, char** argv)
 		}
 		else if (chx == 4)
 		{
-			int ini = 100;
-			stitch(ini, 0);
+			std::cout << "not yet available in this release." << std::endl;
 		}
 
 		waitKey(0);
