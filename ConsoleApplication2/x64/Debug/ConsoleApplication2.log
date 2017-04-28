@@ -1,1 +1,4 @@
-﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Platforms\x64\PlatformToolsets\v141\Toolset.targets(36,5): error MSB8036: le SDK Windows version 10.0.14393.0 est introuvable. Installez la version nécessaire du SDK Windows, ou changez la version du SDK dans les pages de propriétés du projet. Vous pouvez également cliquer avec le bouton droit sur la solution, et sélectionner "Recibler la solution".
+﻿  ConsoleApplication2.cpp
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\consoleapplication2.cpp(69): warning C4244: 'argument' : conversion de 'double' en 'int', perte possible de données
+  ConsoleApplication2.vcxproj -> C:\Users\Jean-Baptiste\Documents\Visual Studio 2017\Projects\image-editor\x64\Debug\ConsoleApplication2.exe
+  ConsoleApplication2.vcxproj -> C:\Users\Jean-Baptiste\Documents\Visual Studio 2017\Projects\image-editor\x64\Debug\ConsoleApplication2.pdb (Partial PDB)
