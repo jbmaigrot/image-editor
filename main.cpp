@@ -7,26 +7,6 @@
 
 using namespace cv;
 
-/*void test()
-{
-    Mat frame= imread("lena.jpg", 1 );
-
-    for(int i=0; i<frame.rows; i++)
-    {
-        for(int j=0; j<frame.cols; j++)
-        {
-            Vec3b color = frame.at<Vec3b>(Point(j,i));
-
-            frame.at<Vec3b>(Point(j,i)) = color;
-        }
-    }
-    namedWindow("IMG Editor", WINDOW_AUTOSIZE );
-    imshow("IMG Editor", frame);
-
-    waitKey(0);
-}*/
-
-///////////////////////////////////////
 
 int choix()
 {
@@ -50,12 +30,13 @@ Mat image;
 int W=0;
 int H=0;
 int mode=0;
+int strength=0;
 
 void dilatation_erosion(int value, void*)
 {
     Mat new_image;
 
-    Mat element = getStructuringElement(MORPH_ELLIPSE,Size(2 * value + 1, 2 * value + 1),Point(value, value));
+    Mat element = getStructuringElement(MORPH_ELLIPSE,Size(2 * strength + 1, 2 * strength + 1),Point(strength, strength));
 
     if(mode==0)
         erode(image, new_image, element);
@@ -132,8 +113,8 @@ int main(int argc, char** argv )
         if(chx==1)
         {
             int ini=0;
-            createTrackbar("E/D", "Image",&mode, 1);
-            createTrackbar("Value", "Image",&ini, 10,dilatation_erosion);
+            createTrackbar("E/D", "Image",&mode, 1,dilatation_erosion);
+            createTrackbar("Value", "Image",&strength, 10,dilatation_erosion);
             dilatation_erosion(ini, 0);
         }
         else if(chx==2)
