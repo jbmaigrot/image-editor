@@ -2,12 +2,36 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/stitching.hpp>
+
 #include <iostream>
+#include <fstream>
 
 using namespace cv;
+using namespace std;
+
+//Variables globales
+Mat image;
+int W = 0;
+int H = 0;
+int mode = 0;
+int strength = 0;
+Mat new_image;
 
 
-int choix()
+void save()
+{
+	char name[500] = "";
+	std::cout << "Name : " << std::endl;
+	std::cin >> name;
+	std::stringstream ss;
+	ss << name << ".jpg";
+	imwrite(ss.str(), new_image);
+	std::cout << "Saved." << std::endl;
+}
+
+int choice()
 {
 	int r = -1;
 	std::cout << "\nFunctions : \n" << std::endl;
@@ -16,8 +40,9 @@ int choix()
 	std::cout << "Resizing : 2" << std::endl;
 	std::cout << "Lighten / Darken : 3" << std::endl;
 	std::cout << "Panorama / stitching : 4" << std::endl;
+	std::cout << "Save : 5" << std::endl;
 
-	while (r<0 || r>4)
+	while (r<0 || r>5)
 	{
 		std::cout << "\nChoix : " << std::endl;
 		std::cin >> r;
@@ -25,15 +50,9 @@ int choix()
 	return r;
 }
 
-Mat image;
-int W = 0;
-int H = 0;
-int mode = 0;
-int strength = 0;
-
-void dilatation_erosion(int value, void*)
+void dilate_erode(int value, void*)
 {
-	Mat new_image;
+	//Mat new_image;
 
 	Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * strength + 1, 2 * strength + 1), Point(strength, strength));
 
@@ -46,14 +65,14 @@ void dilatation_erosion(int value, void*)
 
 void light(int value, void*)
 {
-	Mat new_image = image*(double)(value) / 100.0;
+	new_image = image*(double)(value) / 100.0;
 
 	imshow("Image", new_image);
 }
 
-void resizing(int value, void*)
+void resize(int value, void*)
 {
-	Mat new_image;
+	//Mat new_image;
 	if (H<1)
 		H = 1;
 	if (W<1)
@@ -75,6 +94,32 @@ void resizing(int value, void*)
 	imshow("Image", new_image);
 }
 
+void stitch(int argc, char** argv)
+{
+	vector<Mat> imgs;
+
+	for (int i = 1; i < argc; ++i)
+	{
+		Mat img = imread(argv[i]);
+		if (img.empty())
+		{
+			cout << "Can't read image '" << argv[i] << "'\n";
+		}
+		imgs.push_back(img);
+	}
+
+	//Mat new_image;
+	Ptr<Stitcher> stitcher = Stitcher::create(Stitcher::PANORAMA, false);
+	Stitcher::Status status = stitcher->stitch(imgs, new_image);
+
+	if (status != Stitcher::OK)
+	{
+		cout << "Can't stitch images, error code = " << int(status) << endl;
+	}
+	imshow("Image", new_image);
+}
+
+// MAIN
 int main(int argc, char** argv)
 {
 	int response = 0;
@@ -95,11 +140,13 @@ int main(int argc, char** argv)
 	}
 	else
 		image = imread(argv[1]);
+	
+	new_image = image;
 
 	int continuer = 1;
 	while (continuer)
 	{
-		int chx = choix();
+		int chx = choice();
 
 		if (chx == 0)
 			continuer = 0;
@@ -112,18 +159,18 @@ int main(int argc, char** argv)
 		if (chx == 1)
 		{
 			int ini = 0;
-			createTrackbar("E/D", "Image", &mode, 1, dilatation_erosion);
-			createTrackbar("Value", "Image", &strength, 10, dilatation_erosion);
-			dilatation_erosion(ini, 0);
+			createTrackbar("E/D", "Image", &mode, 1, dilate_erode);
+			createTrackbar("Value", "Image", &strength, 10, dilate_erode);
+			dilate_erode(ini, 0);
 		}
 		else if (chx == 2)
 		{
 			int ini = 0;
 			W = image.cols;
 			H = image.rows;
-			createTrackbar("Width", "Image", &W, 1000, resizing);
-			createTrackbar("Height", "Image", &H, 1000, resizing);
-			resizing(ini, 0);
+			createTrackbar("Width", "Image", &W, 1000, resize);
+			createTrackbar("Height", "Image", &H, 1000, resize);
+			resize(ini, 0);
 		}
 		else if (chx == 3)
 		{
@@ -133,7 +180,18 @@ int main(int argc, char** argv)
 		}
 		else if (chx == 4)
 		{
-			std::cout << "not yet available in this release." << std::endl;
+			if (argc < 3)
+			{
+				std::cout << "To use the panorama function:\nLaunch the program with all your pictures as arguments,\nor drop the files on the executable." << std::endl;
+			}
+			else
+			{
+				stitch(argc, argv);
+			}			
+		}
+		else if (chx == 5)
+		{
+			save();
 		}
 
 		waitKey(0);
@@ -141,3 +199,4 @@ int main(int argc, char** argv)
 
 	return 0;
 }
+
