@@ -17,7 +17,7 @@ int W = 0;
 int H = 0;
 int mode = 0;
 int strength = 0;
-Mat new_image;
+Mat image_to_save;
 
 
 void save()
@@ -27,7 +27,7 @@ void save()
 	std::cin >> name;
 	std::stringstream ss;
 	ss << name << ".jpg";
-	imwrite(ss.str(), new_image);
+	imwrite(ss.str(), image_to_save);
 	std::cout << "Saved." << std::endl;
 }
 
@@ -52,7 +52,7 @@ int choice()
 
 void dilate_erode(int value, void*)
 {
-	//Mat new_image;
+	Mat new_image;
 
 	Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * strength + 1, 2 * strength + 1), Point(strength, strength));
 
@@ -61,18 +61,23 @@ void dilate_erode(int value, void*)
 	else
 		dilate(image, new_image, element);
 	imshow("Image", new_image);
+	image_to_save=new_image;
 }
 
 void light(int value, void*)
 {
+    Mat new_image;
+
 	new_image = image*(double)(value) / 100.0;
 
 	imshow("Image", new_image);
+	image_to_save=new_image;
 }
 
 void resize(int value, void*)
 {
-	//Mat new_image;
+	Mat new_image;
+
 	if (H<1)
 		H = 1;
 	if (W<1)
@@ -92,10 +97,13 @@ void resize(int value, void*)
 	}
 
 	imshow("Image", new_image);
+	image_to_save=new_image;
 }
 
 void stitch(int argc, char** argv)
 {
+    Mat new_image;
+
 	vector<Mat> imgs;
 
 	for (int i = 1; i < argc; ++i)
@@ -117,6 +125,7 @@ void stitch(int argc, char** argv)
 		cout << "Can't stitch images, error code = " << int(status) << endl;
 	}
 	imshow("Image", new_image);
+	image_to_save=new_image;
 }
 
 // MAIN
@@ -140,8 +149,8 @@ int main(int argc, char** argv)
 	}
 	else
 		image = imread(argv[1]);
-	
-	new_image = image;
+
+	image_to_save = image;
 
 	int continuer = 1;
 	while (continuer)
@@ -187,7 +196,7 @@ int main(int argc, char** argv)
 			else
 			{
 				stitch(argc, argv);
-			}			
+			}
 		}
 		else if (chx == 5)
 		{
