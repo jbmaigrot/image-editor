@@ -116,7 +116,6 @@ void stitch(int argc, char** argv)
 		imgs.push_back(img);
 	}
 
-	//Mat new_image;
 	Ptr<Stitcher> stitcher = Stitcher::create(Stitcher::PANORAMA, false);
 	Stitcher::Status status = stitcher->stitch(imgs, new_image);
 
