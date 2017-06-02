@@ -29,6 +29,7 @@ void save()
 	ss << name << ".jpg";
 	imwrite(ss.str(), image_to_save);
 	std::cout << "Saved." << std::endl;
+	image = image_to_save;
 }
 
 int choice()

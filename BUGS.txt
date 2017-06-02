@@ -1,1 +1,0 @@
-L'érosion (ou la dilation) se cumule. Testez en augmentant puis diminuant l'intensité
