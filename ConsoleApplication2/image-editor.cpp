@@ -4,6 +4,10 @@
 #include <opencv2/videoio/videoio.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/stitching.hpp>
+#include "opencv2/objdetect/objdetect.hpp"
+
+#include <iostream>
+#include <stdio.h>
 
 #include <iostream>
 #include <fstream>
@@ -41,9 +45,10 @@ int choice()
 	std::cout << "Resizing : 2" << std::endl;
 	std::cout << "Lighten / Darken : 3" << std::endl;
 	std::cout << "Panorama / stitching : 4" << std::endl;
-	std::cout << "Save : 5" << std::endl;
+	std::cout << "Face detection : 5" << std::endl;
+	std::cout << "Save : 6" << std::endl;
 
-	while (r<0 || r>5)
+	while (r<0 || r>6)
 	{
 		std::cout << "\nChoix : " << std::endl;
 		std::cin >> r;
@@ -128,6 +133,46 @@ void stitch(int argc, char** argv)
 	image_to_save=new_image;
 }
 
+void faceDetect()
+{
+	Mat frame = image;
+
+	CascadeClassifier face_cascade;
+	CascadeClassifier eyes_cascade;
+	if (!face_cascade.load("haarcascade_frontalface_alt.xml")) { printf("--(!)Error loading1\n"); return; };
+	if (!eyes_cascade.load("haarcascade_eye_tree_eyeglasses.xml")) { printf("--(!)Error loading2\n"); return; };
+
+	std::vector<Rect> faces;
+	Mat frame_gray;
+
+	cvtColor(frame, frame_gray, CV_BGR2GRAY);
+	equalizeHist(frame_gray, frame_gray);
+
+	//-- Detect faces
+	face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+
+	for (size_t i = 0; i < faces.size(); i++)
+	{
+		Point center(faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5);
+		ellipse(frame, center, Size(faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, Scalar(255, 0, 255), 4, 8, 0);
+
+		Mat faceROI = frame_gray(faces[i]);
+		std::vector<Rect> eyes;
+
+		//-- In each face, detect eyes
+		eyes_cascade.detectMultiScale(faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, Size(30, 30));
+
+		for (size_t j = 0; j < eyes.size(); j++)
+		{
+			Point center(faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5);
+			int radius = cvRound((eyes[j].width + eyes[j].height)*0.25);
+			circle(frame, center, radius, Scalar(255, 0, 0), 4, 8, 0);
+		}
+	}
+	imshow("Image", frame);
+	image_to_save = frame;
+}
+
 // MAIN
 int main(int argc, char** argv)
 {
@@ -200,7 +245,15 @@ int main(int argc, char** argv)
 		}
 		else if (chx == 5)
 		{
+			faceDetect();
+		}
+		else if (chx == 6)
+		{
 			save();
+		}
+		else
+		{
+			cout << "Bad input :(" << endl;
 		}
 
 		waitKey(0);
@@ -208,4 +261,3 @@ int main(int argc, char** argv)
 
 	return 0;
 }
-

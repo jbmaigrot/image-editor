@@ -1,5 +1,8 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(387,5): warning MSB8028: Le répertoire intermédiaire (x64\Debug\) contient des fichiers partagés provenant d'un autre projet (ConsoleApplication2.vcxproj). Cela peut entraîner un comportement de nettoyage et de régénération incorrect.
   image-editor.cpp
-c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\image-editor.cpp(94): warning C4244: 'argument' : conversion de 'double' en 'int', perte possible de données
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\image-editor.cpp(99): warning C4244: 'argument' : conversion de 'double' en 'int', perte possible de données
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\image-editor.cpp(156): warning C4244: 'argument' : conversion de 'double' en 'int', perte possible de données
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\image-editor.cpp(157): warning C4244: 'argument' : conversion de 'double' en 'int', perte possible de données
+c:\users\jean-baptiste\documents\visual studio 2017\projects\image-editor\consoleapplication2\image-editor.cpp(167): warning C4244: 'argument' : conversion de 'double' en 'int', perte possible de données
   ConsoleApplication2.vcxproj -> C:\Users\Jean-Baptiste\Documents\Visual Studio 2017\Projects\image-editor\x64\Debug\image-editor.exe
   ConsoleApplication2.vcxproj -> C:\Users\Jean-Baptiste\Documents\Visual Studio 2017\Projects\image-editor\x64\Debug\image-editor.pdb (Partial PDB)
